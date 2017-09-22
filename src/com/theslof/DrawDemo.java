@@ -2,6 +2,8 @@ package com.theslof;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 public class DrawDemo extends JPanel{
@@ -41,6 +43,24 @@ public class DrawDemo extends JPanel{
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         setBackground(Color.WHITE);
 
+        //Lyssna efter musklick
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    addThread = new Thread(() -> {
+                        int x = e.getX();
+                        int y = e.getY();
+
+                        //Skapa nya bollar på musklick, exempelvis
+
+                    });
+                    addThread.start();
+                }
+            }
+        });
+
+
         //Lägg till grafiska objekt i en egen tråd. Denna tråden låser logik/grafik.
         addThread = new Thread(this::initializeObjects);
         addThread.start();
@@ -78,7 +98,8 @@ public class DrawDemo extends JPanel{
 
     //Uppdatera x/y för varje objekt och kolla kollisioner
     private void updateObjects(double dt) {
-        for(Graphical g : graphics){
+        for (int i = 0; i < graphics.size(); i++) {
+            Graphical g = graphics.get(i);
             if(g instanceof Ball){
                 Ball b = (Ball) g;
                 //Uppdatera vx/vy

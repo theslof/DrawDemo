@@ -10,7 +10,11 @@ public class Ball extends Graphical {
     private double vy;
 
     public Ball(int radius, double x, double y, double vx, double vy){
-        //Sätt initialvärden
+        this.radius = radius;
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
     }
 
     public void update(double dt){
