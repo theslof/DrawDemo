@@ -101,7 +101,8 @@ public class DrawDemo extends JPanel{
                 e.printStackTrace();
             }
 
-            repaint(); //Måla om vår instans av DrawDemo. Denna kallar på drawComponent() vilket vi måste överladda
+            EventQueue.invokeLater(this::repaint); //Måla om vår instans av DrawDemo. Denna kallar på drawComponent() vilket vi måste överladda
+
             try {
                 Thread.sleep(1000 / FPS); //Vänta i en frame, dvs. 1000 millisekunder delat med FPS
             } catch (InterruptedException e) {
