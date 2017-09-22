@@ -1,7 +1,6 @@
 package com.theslof;
 
 import javax.swing.*;
-import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.util.Vector;
 
@@ -15,6 +14,7 @@ public class DrawDemo extends JPanel{
 
     //Håll data i en Vector, vilket är en långsammare ArrayList. Den har dock inbyggt stöd för multitrådning.
     private Vector<Graphical> graphics;
+    private Thread addThread;
 
     // --- Main method, körs först ---
     public static void main(String[] args) {
@@ -41,9 +41,9 @@ public class DrawDemo extends JPanel{
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         setBackground(Color.WHITE);
 
-
-        //Lägg till grafiska objekt i en egen tråd:
-        new Thread(this::initializeObjects).start();
+        //Lägg till grafiska objekt i en egen tråd. Denna tråden låser logik/grafik.
+        addThread = new Thread(this::initializeObjects);
+        addThread.start();
 
         //Logiktråden, ska hantera alla beräkningar
         new Thread(this::logicThread).start();
@@ -62,10 +62,17 @@ public class DrawDemo extends JPanel{
         long lastTime = System.currentTimeMillis();
 
         while(true){
+            try {
+                addThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             long currentTime = System.currentTimeMillis();
             //Beräkna dt, vilket håller reda på hur mycket tid som har passerat relativt till en frame.
             double dt = (double)(currentTime - lastTime) / FPS;
             updateObjects(dt);
+            lastTime = currentTime;
         }
     }
 
@@ -80,6 +87,7 @@ public class DrawDemo extends JPanel{
                 //Kolla kollisioner och updatera vx/vy samt x/y vid behov
                 //Börja med väggar, kollision mellan objekt är mycket svårare matematiskt
                 //checkCollisions(b)
+
             }
         }
     }
@@ -87,6 +95,12 @@ public class DrawDemo extends JPanel{
     //Uppdatera grafiken. Denna ska köras 60 gånger per sekund, samma som vår FPS-konstant
     private void updateGraphics() {
         while(true){
+            try {
+                addThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             repaint(); //Måla om vår instans av DrawDemo. Denna kallar på drawComponent() vilket vi måste överladda
             try {
                 Thread.sleep(1000 / FPS); //Vänta i en frame, dvs. 1000 millisekunder delat med FPS
